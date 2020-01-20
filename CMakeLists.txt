@@ -1,15 +1,16 @@
-PROJECT(PALETTE_DIRECTOR C)
+project(PALETTE_DIRECTOR C)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-SET(APACHE_INCLUDE_DIR        "/opt/apache/include"  CACHE STRING "The location of the apache include directory")
+set(APACHE_INCLUDE_DIR        "/opt/apache/include"  CACHE STRING "The location of the apache include directory")
 
-INCLUDE_DIRECTORIES( ${APACHE_INCLUDE_DIR} )
+include_directories( ${APACHE_INCLUDE_DIR} )
 
 
-add_library(mod_palette_director MODULE
+# Shared source files
+set(MOD_SOURCE_FILES
         src/palette-macros.h
 
         src/mod_lbmethod_bybusyness.c
@@ -23,21 +24,28 @@ add_library(mod_palette_director MODULE
 
         src/csv/csv.h
         src/csv/libcsv.c
+  )
 
+
+# Common source files
+set(SOURCE_FILES ${MOD_SOURCE_FILES})
+
+# Source files used only on windows
+if(MSVC)
+  set(SOURCE_FILES ${MOD_SOURCE_FILES}
         src/win/inet_ntop.h
         src/win/inet_ntop.c
-        )
+    })
+endif(MSVC)
 
+# This is the main target
+add_library(mod_palette_director MODULE ${SOURCE_FILES})
+
+# We dont want to prefix the library with "lib"
 set_target_properties(mod_palette_director PROPERTIES PREFIX "")
 
-
-set(INSTALLER_COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/nsis")
-FILE(TO_NATIVE_PATH ${INSTALLER_COMPONENTS_PATH} INSTALLER_COMPONENTS_PATH )
-message("CURRENT: ${INSTALLER_COMPONENTS_PATH}")
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPackOptions.cmake.in CPackOptions.cmake @ONLY)
-set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CPackOptions.cmake")
-
+# And we want th extension to be ".so"
+set_target_properties(mod_palette_director PROPERTIES SUFFIX .so)
 
 # Dont complain about missing symbols for our dynamically linked library
 IF(APPLE)
@@ -45,26 +53,31 @@ IF(APPLE)
 ENDIF(APPLE)
 
 
+# Linking for Windows
 IF(MSVC)
-  SET(APACHE_LIB_DIR        "c:/tmp/apache32/lib"  CACHE STRING "The location of the apache lib directory")
+  set(APACHE_LIB_DIR "c:/tmp/apache32/lib"  CACHE STRING "The location of the apache lib directory")
 
   #set_target_properties(mod_palette_director PROPERTIES LINK_FLAGS "/ignore")
   target_link_libraries(mod_palette_director
     ${APACHE_LIB_DIR}/libhttpd.lib
     ${APACHE_LIB_DIR}/libaprutil-1.lib
     ${APACHE_LIB_DIR}/libapr-1.lib
-          wsock32 ws2_32
-          )
+    wsock32 ws2_32
+    )
 
 ENDIF(MSVC)
 
-# Install
+# Installer
 # =============================================================
 
+set(INSTALLER_COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/nsis")
+file(TO_NATIVE_PATH ${INSTALLER_COMPONENTS_PATH} INSTALLER_COMPONENTS_PATH )
+message("CURRENT: ${INSTALLER_COMPONENTS_PATH}")
 
-SET_TARGET_PROPERTIES(mod_palette_director PROPERTIES
-        SUFFIX .so
-        )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPackOptions.cmake.in CPackOptions.cmake @ONLY)
+set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CPackOptions.cmake")
+
+
 
 
 install(TARGETS mod_palette_director
@@ -72,7 +85,7 @@ install(TARGETS mod_palette_director
    LIBRARY DESTINATION modules
    COMPONENT libraries)
 
- install(FILES
+install(FILES
   doc/installer/INSTALL.md
   doc/installer/HOWTO.md
   DESTINATION docs
@@ -83,6 +96,7 @@ install(FILES
   doc/config/workers.csv
   DESTINATION config
   )
+
 
 set(CPACK_GENERATOR NSIS)
 set(CPACK_PACKAGE_NAME "mod_palette_director")
@@ -99,4 +113,4 @@ SET(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/doc/installer/README
 SET(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/doc/installer/WELCOME.txt")
 #SET(CPACK_NSIS_MODIFY_PATH ON)
 
-INCLUDE(CPack)
+include(CPack)

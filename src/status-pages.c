@@ -85,7 +85,7 @@ static void add_table_legend(request_rec* r, size_t hosts_count) {
   ap_rprintf(
       r,
       "<tr>"
-      "<th colspan='%d' style='font-size: 0.8em; text-align:right; "
+      "<th colspan='%lu' style='font-size: 0.8em; text-align:right; "
       "padding-top:20px; color: #aaa;' class='tb-settings-msg'>"
       "<div class='tb-status-legend tb-padded-box'><span "
       "class='tb-status-legend-item ng-scope'>"
@@ -104,7 +104,10 @@ static void add_table_legend(request_rec* r, size_t hosts_count) {
       "class='tb-status-legend-item ng-scope'>"
       "</th>"
       "</tr>",
-      hosts_count + 1);
+      // Do this ugly cast here so we dont have to deal with `size_t`
+      // inconsistencies across platforms/compilers (VS2013 does not support
+      // the standard %zu flag, while VS2015, GCC & CLang do)
+      (unsigned long)(hosts_count + 1));
 }
 
 // Sorting helper that forwards to strcmp

@@ -66,7 +66,7 @@
     entity_name out = empty_##entity_name;                        \
     for (i = 0; i < len; ++i) {                                   \
       type entry = e.entries[i];                                  \
-      if (filter_fn(&entry, state) != 0) {                        \
+      if (filter_fn((const type*)&entry, state) != 0) {           \
         buffer[buffer_size] = entry;                              \
         buffer_size++;                                            \
       }                                                           \

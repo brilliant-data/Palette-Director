@@ -126,18 +126,18 @@ static proxy_worker* find_best_bybusyness_from_list(
         }
 
         /* If the worker is in error state run
-        * retry on that worker. It will be marked as
-        * operational if the retry timeout is elapsed.
-        * The worker might still be unusable, but we try
-        * anyway.
-        */
+         * retry on that worker. It will be marked as
+         * operational if the retry timeout is elapsed.
+         * The worker might still be unusable, but we try
+         * anyway.
+         */
         if (!PROXY_WORKER_IS_USABLE(*worker)) {
           ap_proxy_retry_worker_fn("BALANCER", *worker, r->server);
         }
 
         /* Take into calculation only the workers that are
-        * not in error state or not disabled.
-        */
+         * not in error state or not disabled.
+         */
         if (PROXY_WORKER_IS_USABLE(*worker)) {
           (*worker)->s->lbstatus += (*worker)->s->lbfactor;
           total_factor += (*worker)->s->lbfactor;
@@ -369,10 +369,9 @@ static int status_page_http_handler(request_rec* r) {
 // TODO: use a macro+shared function instead of pure macro
 
 #define BINDING_CONFIG_LOADER(key, name)                                       \
-  \
-static const char* key##binding_set_config_path(cmd_parms* cmd, void* cfg,     \
-                                                const char* arg) \
-{          \
+                                                                               \
+  static const char* key##binding_set_config_path(cmd_parms* cmd, void* cfg,   \
+                                                  const char* arg) {           \
     if (key##binding_configuration.count == 0) {                               \
       key##binding_configuration = parse_csv_config(arg);                      \
       ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, ap_server_conf,                \
@@ -384,8 +383,7 @@ static const char* key##binding_set_config_path(cmd_parms* cmd, void* cfg,     \
           "Bindings config already loaded for " name " from file '%s'.", arg); \
     }                                                                          \
     return NULL;                                                               \
-  \
-}
+  }
 
 BINDING_CONFIG_LOADER(worker, "worker bindings")
 BINDING_CONFIG_LOADER(authoring, "authoring bindings")

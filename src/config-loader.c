@@ -56,6 +56,9 @@ static char* load_file_into_memory(FILE* f, size_t* out_size) {
   return string;
 }
 
+// Apple seems to have this function already present
+#ifndef __APPLE__
+
 // Duplicates a string by duping num_chars chars (and a 0) only
 static const char* strndup(const char* str, size_t num_chars) {
   // clip the length
@@ -69,6 +72,8 @@ static const char* strndup(const char* str, size_t num_chars) {
 
   return o;
 }
+
+#endif
 
 /////////////////////////////////////////////////////////////////
 
