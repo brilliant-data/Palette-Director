@@ -5,8 +5,9 @@ cmake_minimum_required(VERSION 2.8)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(APACHE_INCLUDE_DIR        "/opt/apache/include"  CACHE STRING "The location of the apache include directory")
+set(APR_INCLUDE_DIR           "/opt/apr/include"  CACHE STRING "The location of the APR include directory")
 
-include_directories( ${APACHE_INCLUDE_DIR} )
+include_directories( ${APACHE_INCLUDE_DIR} ${APR_INCLUDE_DIR} )
 
 
 # Shared source files
