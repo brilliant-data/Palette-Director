@@ -142,6 +142,7 @@ You'll need a 32 bit Visual Studio 2010 to compile modules for the apache suppli
 
 * Put the (32 bit) apache installation anywhere on your machine
 * set the `APACHE_INCLUDE_DIR` CMake cache variable to the include directory of that installation
+* set the `APR_INCLUDE_DIR` CMake cache variable to the include directory of APR utility library
 * set the `APACHE_LIB_DIR` CMake cache variable to the lib directory of that installation
 
 * The CPack installer needs attention to make it work
