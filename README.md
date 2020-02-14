@@ -119,10 +119,14 @@ Different formatted versions are available:
 
 ### Inserting the status page into the tableau Cluster Status page:
 
+To inject the HTML output of the "Worker Bindings Status Page" endpoint into
+the Status Page of the Tableau Server, you'll need to add the
+`javascript/director-status-fetcher.js` to the list of loaded JS files on the
+Tableau Server.
 
-A workaround to insert the Status Page into the is by editing the
-`vizPortalLibMin.js` javascript file and adding the following snippet
-to the end:
+
+If editing the HTML template is not possible, then a workaround is editing the
+`vizPortal.js` javascript file and adding the following snippet to the end:
 
 ```
 $.get('/palette-director-status/html', null, function(result){
@@ -130,7 +134,7 @@ $.get('/palette-director-status/html', null, function(result){
 });
 ```
 
-This tries to insert the worker binding statuses after the current
+Both of these approaches try to insert the worker binding statuses after the current
 cluster status table.
 
 
@@ -138,19 +142,57 @@ cluster status table.
 
 ## Building
 
+### Windows
+
 You'll need a 32 bit Visual Studio 2010 to compile modules for the apache supplied with Tableau
 
 * Put the (32 bit) apache installation anywhere on your machine
 * set the `APACHE_INCLUDE_DIR` CMake cache variable to the include directory of that installation
+* set the `APR_INCLUDE_DIR` CMake cache variable to the include directory of APR utility library
 * set the `APACHE_LIB_DIR` CMake cache variable to the lib directory of that installation
 
 * The CPack installer needs attention to make it work
 
+
+### Ubuntu
+
+On a fresh Ubuntu you'll need the `apache2-dev` and `cmake` packages. (APR is
+installed as a dependency of the `apache2-dev` package.)
+
+```
+# Install dependencies
+sudo apt-get install apache2-dev cmake
+
+# Create a build directory in /tmp
+mkdir /tmp/palette-director-build
+
+# Go to the build directory
+cd /tmp/palette-director-build
+
+# Create the makefile using the default location of the apache2-dev package
+cmake <SOURCE_DIR> -DAPACHE_INCLUDE_DIR=/usr/include/apache2 -DAPR_INCLUDE_DIR=/usr/include/apr-1.0
+
+# Run the build
+make
+```
+
+Other UNIX variants should also work, but the package manager usage and the
+default install locations may differ from Ubuntu. Please consult the
+documentation of your package manager for details.
+
+
+### OSX
+
+For developing on OSX you'll need to manually download a source release of
+Apache and APR (along with APR-utils), but everything else should work just
+like on Ubuntu.
+
+
 ## Code format
 
-All code in the repository is formatted by clang-format with the settings checked in 
-as `.clang-format` so running 
+All code in the repository is formatted by clang-format with the settings
+checked in as `.clang-format` so running
 
-```clang-format -i src/*.{c,h}``` 
+```clang-format -i src/*.{c,h}```
 
 should format all your code for the coding standards of the project.

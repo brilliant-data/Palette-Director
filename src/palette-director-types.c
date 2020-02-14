@@ -25,6 +25,10 @@
 #include "win/inet_ntop.h"
 #else
 #include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+
 #endif
 
 // implement the functions for these slice types
@@ -104,7 +108,7 @@ const char* ip_resolver_lookup(ip_resolver_table* r, const char* hostname) {
                        ip_buffer, kIP_BUFFER_SIZE);
     if (ip_out == NULL) {
       ap_log_error(APLOG_MARK, APLOG_ERR, 0, ap_server_conf,
-                   "Failed converting hostname '%s' to IP address reason: '%d'",
+                   "Failed converting hostname '%s' to IP address reason: '%s'",
                    hostname, inet_ntop_strerror(errno));
       add_ip_to_resolver(r, hostname, NULL);
       return NULL;
